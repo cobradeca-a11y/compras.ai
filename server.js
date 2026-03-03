@@ -33,6 +33,9 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production'
   }
 }));
+// ===== SERVIR FRONTEND =====
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ================= UTILITÁRIOS =================
 
@@ -238,6 +241,10 @@ app.post('/api/reset-senha', async (req, res) => {
 
       res.json({ sucesso: true, mensagem: 'Senha redefinida com sucesso' });
 
+      // ===== ROTA RAIZ =====
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
     }
   );
 });
