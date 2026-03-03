@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: compras-ai
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /var/data/compras_ai.db
+    disk:
+      name: compras-ai-data
+      mountPath: /var/data
+      sizeGB: 1
