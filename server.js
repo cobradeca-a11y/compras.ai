@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const db = require('./config/database');
@@ -17,6 +19,39 @@ const { gerarETP } = require('./templates/etp');
 const { gerarMapaRisco } = require('./templates/mapaRisco');
 
 const app = express();
+function baseUrl(req) {
+  return process.env.APP_BASE_URL || `${req.protocol}://${req.get('host')}`;
+}
+
+async function sendEmail({ to, subject, html }) {
+  if (!process.env.SMTP_HOST) {
+    console.log("📩 SMTP não configurado. Simulando envio para:", to);
+    console.log("Assunto:", subject);
+    console.log("Conteúdo:", html);
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: String(process.env.SMTP_SECURE || "false") === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+    to,
+    subject,
+    html,
+  });
+}
+
+function gerarToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
 const PORT = process.env.PORT || 3000;
 
 // Render/Heroku/Proxy (HTTPS)
@@ -58,13 +93,45 @@ app.post('/api/registro', async (req, res) => {
     const sql = "INSERT INTO usuarios (nome, email, senha_hash, telefone, unidade, cargo, estado, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))";
     
     db.run(sql, [nome, email, senhaHash, telefone, unidade, cargo, estado], function(err) {
-      if (err) {
-        if (err.message.includes('UNIQUE')) {
-          return res.status(400).json({ erro: 'Email já cadastrado' });
-        }
-        return res.status(500).json({ erro: 'Erro ao cadastrar' });
-      }
-      res.json({ sucesso: true, usuario_id: this.lastID, mensagem: 'Cadastro realizado!' });
+  if (err) {
+    if (err.message.includes('UNIQUE')) {
+      return res.status(400).json({ erro: 'Email já cadastrado' });
+    }
+    return res.status(500).json({ erro: 'Erro ao cadastrar' });
+  }
+
+  const usuarioId = this.lastID;
+
+  // gera token
+  const token = gerarToken();
+
+  // salva token (expira em 24h)
+  db.run(
+    "INSERT INTO auth_tokens (usuario_id, tipo, token, expira_em) VALUES (?, 'verify', ?, datetime('now', '+1 day'))",
+    [usuarioId, token],
+    async () => {
+
+      const link = `${baseUrl(req)}/api/verificar-email?token=${token}`;
+
+      await sendEmail({
+        to: email,
+        subject: "Confirme seu cadastro no Compras.AI",
+        html: `
+          <p>Olá, ${nome}!</p>
+          <p>Clique no link abaixo para confirmar seu cadastro:</p>
+          <p><a href="${link}">${link}</a></p>
+          <p>Esse link expira em 24 horas.</p>
+        `
+      });
+
+      res.json({
+        sucesso: true,
+        usuario_id: usuarioId,
+        mensagem: "Cadastro realizado! Verifique seu e-mail para confirmar."
+      });
+    }
+  );
+});
     });
   } catch (error) {
     res.status(500).json({ erro: 'Erro no servidor' });
