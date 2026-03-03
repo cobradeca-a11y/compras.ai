@@ -12,4 +12,4 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: DB_PATH
-        value: /var/data/compras_ai.db
+        value: ./compras_ai.db
