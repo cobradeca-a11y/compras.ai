@@ -1,1 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compras.AI - Sistema Inteligente de Aquisições Públicas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--gray-50);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-google {
+      background: white;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn-google:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--gray-900);
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--gray-700);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Lists */
+    .list-item {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .list-item:hover {
+      border-color: var(--primary);
+    }
+
+    .list-item-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--gray-900);
+    }
+
+    .list-item-meta {
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    /* Tags */
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .tag {
+      padding: 4px 10px;
+      background: var(--gray-100);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .tag-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .tag-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    /* Login Screen */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 32px;
+      color: var(--gray-900);
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #34d399;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fbbf24;
+    }
+
+    /* Details */
+    .detail-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .detail-label {
+      font-weight: 600;
+      width: 200px;
+      color: var(--gray-700);
+    }
+
+    .detail-value {
+      flex: 1;
+      color: var(--gray-900);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray-600);
+    }
+
+    .spinner {
+      border: 3px solid var(--gray-200);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray-600);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    const API_URL = '';
+
+    // Estado da aplicação
+    const state = {
+      loading: true,
+      user: null,
+      aquisicoes: [],
+      aquisicaoAtual: null,
+      showForm: false
+    };
+
+    // Verificar sessão ao carregar
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/sessao');
+        const data = await res.json();
+        
+        if (data.autenticado) {
+          state.user = data.usuario;
+          await loadAquisicoes();
+        }
+      } catch (error) {
+        console.error('Erro ao verificar sessão:', error);
+      } finally {
+        state.loading = false;
+        render();
+      }
+    }
+
+    // Carregar aquisições
+    async function loadAquisicoes() {
+      try {
+        const res = await fetch('/api/minhas-aquisicoes');
+        const data = await res.json();
+        state.aquisicoes = data.aquisicoes || [];
+      } catch (error) {
+        console.error('Erro ao carregar aquisições:', error);
+      }
+    }
+
+    // Selecionar aquisição
+    async function selectAquisicao(id) {
+      try {
+        const res = await fetch(`/api/aquisicao/${id}`);
+        const data = await res.json();
+        state.aquisicaoAtual = data.aquisicao;
+        state.aquisicaoAtual.documentos = data.documentos;
+        render();
+      } catch (error) {
+        console.error('Erro ao carregar aquisição:', error);
+        alert('Erro ao carregar aquisição');
+      }
+    }
+
+    // Criar nova aquisição
+    async function createAquisicao(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const res = await fetch('/api/aquisicao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error('Erro ao criar aquisição');
+
+        const result = await res.json();
+        alert('Aquisição criada com sucesso!');
+        
+        await loadAquisicoes();
+        await selectAquisicao(result.aquisicao_id);
+        
+        state.showForm = false;
+        render();
+      } catch (error) {
+        console.error('Erro ao criar aquisição:', error);
+        alert('Erro ao criar aquisição');
+      }
+    }
+
+    // Gerar documentos
+    async function gerarDocumentos() {
+      if (!state.aquisicaoAtual) return;
+
+      if (!confirm('Gerar documentos para esta aquisição?')) return;
+
+      try {
+        const res = await fetch(`/api/aquisicao/${state.aquisicaoAtual.id}/gerar-documentos`, {
+          method: 'POST'
+        });
+
+        if (!res.ok) throw new Error('Erro ao gerar documentos');
+
+        const data = await res.json();
+        alert('Documentos gerados com sucesso!');
+        
+        await selectAquisicao(state.aquisicaoAtual.id);
+      } catch (error) {
+        console.error('Erro ao gerar documentos:', error);
+        alert('Erro ao gerar documentos');
+      }
+    }
+
+    // Logout
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+        state.user = null;
+        state.aquisicoes = [];
+        state.aquisicaoAtual = null;
+        render();
+      } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+      }
+    }
+
+    // Renderizar a aplicação
+    function render() {
+      const app = document.getElementById('app');
+
+      if (state.loading) {
+        app.innerHTML = `
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (!state.user) {
+        app.innerHTML = renderLogin();
+        return;
+      }
+
+      app.innerHTML = renderApp();
+      attachEventListeners();
+    }
+
+    function renderLogin() {
+      return `
+        <div class="login-screen">
+          <div class="login-card">
+            <h1 class="login-title">Compras.AI</h1>
+            <p style="text-align: center; color: var(--gray-600); margin-bottom: 32px;">
+              Sistema Inteligente de Aquisições Públicas
+            </p>
+            
+            <button class="btn btn-google" style="width: 100%;" onclick="window.location.href='/auth/google'">
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/>
+                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+              </svg>
+              Entrar com Google
+            </button>
+
+            <p style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--gray-600);">
+              100% gratuito • Sem mensalidades
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderApp() {
+      const params = new URLSearchParams(window.location.search);
+      const alert = params.get('sucesso') === 'login' 
+        ? '<div class="alert alert-success">Login realizado com sucesso!</div>' 
+        : '';
+
+      return `
+        <header>
+          <div class="container">
+            <div class="header-content">
+              <div class="logo">Compras.AI</div>
+              <div class="user-info">
+                ${state.user.avatar ? `<img src="${state.user.avatar}" class="avatar" alt="Avatar">` : ''}
+                <span>${state.user.nome}</span>
+                <button class="btn btn-secondary" onclick="logout()">Sair</button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="container">
+          ${alert}
+          
+          <div class="grid grid-2" style="margin-top: 24px;">
+            <!-- Lista de Aquisições -->
+            <div>
+              <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                  <h2 class="card-title" style="margin: 0;">Minhas Aquisições</h2>
+                  <button class="btn btn-primary" onclick="toggleForm()">
+                    ${state.showForm ? 'Cancelar' : '+ Nova'}
+                  </button>
+                </div>
+
+                <div class="${state.showForm ? '' : 'hidden'}" id="form-container">
+                  ${renderForm()}
+                </div>
+
+                <div class="${state.showForm ? 'hidden' : ''}">
+                  ${state.aquisicoes.length === 0 
+                    ? '<div class="empty-state">Nenhuma aquisição cadastrada</div>' 
+                    : state.aquisicoes.map(a => `
+                        <div class="list-item" onclick="selectAquisicao(${a.id})">
+                          <div class="list-item-title">#${a.id} - ${a.descricao.substring(0, 60)}${a.descricao.length > 60 ? '...' : ''}</div>
+                          <div class="list-item-meta">${a.modalidade} • ${a.tipo_contratacao}</div>
+                          <div class="tags">
+                            <span class="tag ${a.gera_etp === 'SIM' ? 'tag-warning' : ''}">ETP: ${a.gera_etp || 'N/A'}</span>
+                            <span class="tag ${a.gera_mapa_risco === 'SIM' ? 'tag-warning' : ''}">Mapa: ${a.gera_mapa_risco || 'N/A'}</span>
+                          </div>
+                        </div>
+                      `).join('')
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Detalhes -->
+            <div>
+              ${state.aquisicaoAtual ? renderDetalhes() : renderEmptyDetails()}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderForm() {
+      return `
+        <form onsubmit="createAquisicao(event)">
+          <div class="form-group">
+            <label>Descrição do objeto *</label>
+            <textarea name="descricao" required></textarea>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Modalidade *</label>
+              <select name="modalidade" required>
+                <option value="DISPENSA">Dispensa</option>
+                <option value="INEXIGIBILIDADE">Inexigibilidade</option>
+                <option value="PREGAO">Pregão</option>
+                <option value="CONCORRENCIA">Concorrência</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Tipo de Contratação *</label>
+              <select name="tipo_contratacao" required>
+                <option value="PONTUAL">Pontual</option>
+                <option value="CONTINUADA">Continuada</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Complexidade</label>
+              <select name="complexidade">
+                <option value="BAIXA">Baixa</option>
+                <option value="MEDIA">Média</option>
+                <option value="ALTA">Alta</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Valor Estimado (R$)</label>
+              <input type="number" name="valor_estimado" step="0.01">
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label>Quantidade</label>
+              <input type="text" name="quantidade">
+            </div>
+
+            <div class="form-group">
+              <label>Prazo (dias)</label>
+              <input type="number" name="prazo">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" rows="3"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Criar Aquisição</button>
+        </form>
+      `;
+    }
+
+    function renderDetalhes() {
+      const a = state.aquisicaoAtual;
+      return `
+        <div class="card">
+          <h2 class="card-title">Detalhes da Aquisição #${a.id}</h2>
+          
+          <div class="detail-row">
+            <div class="detail-label">Modalidade</div>
+            <div class="detail-value">${a.modalidade}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Tipo</div>
+            <div class="detail-value">${a.tipo_contratacao}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Descrição</div>
+            <div class="detail-value">${a.descricao}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Valor Estimado</div>
+            <div class="detail-value">${a.valor_estimado ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(a.valor_estimado) : 'Não informado'}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">ETP</div>
+            <div class="detail-value">
+              <span class="tag ${a.gera_etp === 'SIM' ? 'tag-warning' : 'tag-success'}">${a.gera_etp}</span>
+              <br><small style="color: var(--gray-600);">${a.motivo_etp || ''}</small>
+            </div>
+          </div>
+
+          <div class="detail-row" style="border-bottom: none;">
+            <div class="detail-label">Mapa de Risco</div>
+            <div class="detail-value">
+              <span class="tag ${a.gera_mapa_risco === 'SIM' ? 'tag-warning' : 'tag-success'}">${a.gera_mapa_risco}</span>
+              <br><small style="color: var(--gray-600);">${a.motivo_mapa_risco || ''}</small>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <button class="btn btn-primary" onclick="gerarDocumentos()" style="width: 100%; margin-bottom: 12px;">
+            📄 Gerar Documentos
+          </button>
+
+          ${a.documentos && a.documentos.length > 0 ? `
+            <div style="margin-top: 16px;">
+              <strong>Documentos Gerados:</strong>
+              ${a.documentos.map(d => `
+                <div style="margin-top: 8px;">
+                  <a href="/documentos/${d.arquivo_nome}" target="_blank" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
+                    📥 ${d.tipo_documento}
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderEmptyDetails() {
+      return `
+        <div class="card">
+          <h2 class="card-title">Detalhes</h2>
+          <div class="empty-state">
+            Selecione uma aquisição para ver os detalhes
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleForm() {
+      state.showForm = !state.showForm;
+      render();
+    }
+
+    function attachEventListeners() {
+      // Os event listeners já estão inline no HTML
+      // Esta função existe para futuras necessidades
+    }
+
+    // Inicializar aplicação
+    checkSession();
+  </script>
+</body>
+</html>
