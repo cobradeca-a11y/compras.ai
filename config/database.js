@@ -29,6 +29,26 @@ function inicializarBanco() {
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (aquisicao_id) REFERENCES aquisicoes(id)
   )`, err => err ? console.error('Erro docs:', err) : console.log('✅ documentos OK'));
+
+  db.run(`CREATE TABLE IF NOT EXISTS auth_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER NOT NULL,
+    tipo TEXT NOT NULL,             -- 'verify' ou 'reset'
+    token TEXT NOT NULL UNIQUE,
+    expira_em DATETIME NOT NULL,
+    usado_em DATETIME,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+  )`);
+
+  // adiciona coluna email_verificado (se não existir)
+  db.all("PRAGMA table_info(usuarios)", (err, cols) => {
+    if (err) return;
+    const has = (name) => cols.some(c => c.name === name);
+    if (!has("email_verificado")) {
+      db.run("ALTER TABLE usuarios ADD COLUMN email_verificado INTEGER DEFAULT 0");
+    }
+  });
 }
 
 module.exports = db;
